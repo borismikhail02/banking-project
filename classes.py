@@ -1,3 +1,6 @@
+from datetime import date
+
+
 class Accounts():
     def __init__(self, createBlank):
         if createBlank:
@@ -6,25 +9,30 @@ class Accounts():
     def getAccounts(self):
         return self.accountsList
 
+    def clearAccounts(self):
+        self.accountsList = []
+
     def listAccounts(self):
         print('accounts list: ', self.accountsList)
         for item in self.accountsList:
             item.displayDetails()
         
     def clientSearch(self, type, search):
-        if type == 'name' or type == 'dob':
-            print("searching by", 'type')
-            check = (client.type == search)
-        elif type == 'negBalance':
-            print("searching by neg balance")
-            check = (client.balance > 0)
-        else:
-            print("Invalid search type")
-        
         outputList = []
         for client in self.accountsList:
-            if check:
+            if type == 'name':
+                print("Searching by the name:", search)
+                check = ' '.join(str(e) for e in client.getName())
+                print('checking:', str(check))
+            elif type == 'dob':
+                print("Searching by the date of birth:", search)
+                check = str(client.getDob())
+            elif type == 'negBalance':
+                print("searching by neg balance")
+                check = (client.balance() > 0)
+            if check == search:
                 outputList.append(client)
+        return outputList
     
     def addClient(self, clientDetails):
         newClient = ClientAccount(clientDetails)

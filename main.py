@@ -22,7 +22,7 @@ def loadAccounts():
         except:
             print('No object loaded on that file')
             return False
-    
+     
     # Creates a new object to load into file if none are found
     def createFileObject():
         accounts = c.Accounts(True)

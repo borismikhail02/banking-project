@@ -1,9 +1,39 @@
 import classes as c
 from fileHandling import createFile, saveFile
-from datetime import datetime, date
+from datetime import date
+import re
 
+        
 # Declaration of main application menu
 def mainMenu(accounts):
+    # Checks if input is all alphabetical characters and contains at least one character
+    def textValidityCheck(inputText):
+        if inputText.isalpha():
+            return True
+        return False
+
+    # Checks if the input is an integer value
+    def intValidityCheck(data, range):
+        try:
+            if (int(data) >= range[0] and int(data) <= range[1]):
+                return True
+        except:
+            return False
+
+    def dateValidityCheck(date):
+        splitData = re.split('\/|\.|\-|,', date)
+        try:
+            if int(splitData[0]) and int(splitData[1]) and int(splitData[2]):
+                pass
+            if len(splitData) != 3 or len(splitData[0]) != 4 or len(splitData[1]) != 2 or len(splitData[2]) != 2:
+                print('Incorrect date entry, please ensure its in the format YYYY/MM/DD exactly')
+                return False
+        except:
+            return False
+        searchDate = ("{0}-{1}-{2}").format(splitData[0],splitData[1],splitData[2])
+        return(searchDate)
+
+            
 
     # Declarations of submenus within main menu
     def clearClientsMenu():
@@ -30,32 +60,15 @@ def mainMenu(accounts):
         if userInput == 'y' or userInput == 'Y':
             print('You have selected: Yes')
             print("Clearing entire file")
-            createFile()
-            return mainMenu()
+            accounts.clearAccounts()
+            return mainMenu(accounts)
         else:
             print('You have selected: No')
             print("Going back to main menu")
-            return mainMenu()
+            return mainMenu(accounts)
+        
 
     def addClientMenu():
-
-        # Checks if input is all alphabetical characters and contains at least one character
-        def textValidityCheck(inputText):
-            if inputText.isalpha():
-                return True
-            return False
-
-        # Checks if the input is an integer value
-        def intValidityCheck(data, range):
-            try:
-                if (int(data) >= range[0] and int(data) <= range[1]):
-                    return True
-            except:
-                return False
-
-        def dateValidityCheck(inputData):
-            pass
-
         # Selection menu for prefered title
         def titleMenu():
             titles = ['Mr','Mrs','Miss','Ms','Dr','Other']
@@ -68,7 +81,7 @@ def mainMenu(accounts):
             6 - Other\n''')
             # Loops an error until a valid input within range is given
             while not intValidityCheck(userInput, (1,6)):
-                input('Input was not valid, please press emter to try again')
+                input('Input was not valid, please press enter to try again')
                 return titleMenu()
             return titles[int(userInput)-1]
 
@@ -82,7 +95,7 @@ def mainMenu(accounts):
             4 - Other\n''')
             # Loops an error until a valid input within range is given
             while not intValidityCheck(userInput, (1,4)):
-                input('Input was not valid, please press emter to try again')
+                input('Input was not valid, please press enter to try again')
                 return pronounsMenu()
             return pronouns[int(userInput)-1]
 
@@ -92,17 +105,17 @@ def mainMenu(accounts):
             year = input("Please enter the year: ")
             # Loops an error until a valid input within range is given
             while not intValidityCheck(year, (date.today().year-150,date.today().year)):
-                input('Input was not valid, please press emter to try again')
+                input('Input was not valid, please press enter to try again')
                 return dobMenu()
             month = input("Please enter the month: ")
             # Loops an error until a valid input within range is given
             while not intValidityCheck(month, (1,12)):
-                input('Input was not valid, please press emter to try again')
+                input('Input was not valid, please press enter to try again')
                 return dobMenu()
             day = input("Please enter the day: ")
             # Loops an error until a valid input within range is given
             while not intValidityCheck(day, (1,31)):
-                input('Input was not valid, please press emter to try again')
+                input('Input was not valid, please press enter to try again')
                 return dobMenu()
             return date(int(year),int(month),int(day))
 
@@ -111,7 +124,7 @@ def mainMenu(accounts):
             overdraft = input("Please enter your desired overdraft (min £0, max £350):\n £")
             # Loops an error until a valid input within range is given
             while not intValidityCheck(overdraft, (0,350)):
-                input('Input was not valid, please press emter to try again')
+                input('Input was not valid, please press enter to try again')
                 return overdraftMenu()
             return overdraft
 
@@ -120,7 +133,7 @@ def mainMenu(accounts):
                 details[location] = data
                 return True
             else:
-                input('Input was not valid, please press emter to try again')
+                input('Input was not valid, please press enter to try again')
                 return False
 
         details = {}
@@ -152,6 +165,30 @@ def mainMenu(accounts):
         input('Press enter to go back to main menu')
         return mainMenu(accounts)
 
+    def selectClientMenu():
+        userInput = input('''How would you like to search for accounts:
+        1 - Search by full name
+        2 - Search by date of birth
+        3 - Search for negative balances
+        ''')
+        # Loops an error until a valid input within range is given
+        while not intValidityCheck(userInput, (1,3)):
+            input('Input was not valid, please press enter to try again')
+            return selectClientMenu()
+        if userInput == '1':
+            print("You have selected: Search by full name")
+            search = input("Please type the full name as seen in account details:\n")
+            results = accounts.clientSearch('name', search)
+        elif userInput == '2':
+            print("You have selected: Search by date of birth")
+            search = input("Please type the full date of birth in the format YYYY/MM/DD:\n")
+            while not dateValidityCheck(search):
+                input('Input was not valid, please press enter to try again')
+                return selectClientMenu()
+            results = accounts.clientSearch('dob', dateValidityCheck(search))
+        print('results:', results)
+
+        mainMenu(accounts)
 
     # Beginning of main menu
     print('''
@@ -179,11 +216,11 @@ def mainMenu(accounts):
     except ValueError:
         print('User input is not a recognisable value for this input')
         input('Please press enter to try again')
-        return mainMenu()
+        return mainMenu(accounts)
     except c.ValueRangeError:
         print("Value inputed is out of range")
         input('Please press enter to try again')
-        return mainMenu()
+        return mainMenu(accounts)
     except:
         print('Unknown error')
         input('Please press enter to try again')
@@ -198,6 +235,7 @@ def mainMenu(accounts):
         clearClientsMenu()
     elif userInput == 3:
         print('Selecting client selected')
+        selectClientMenu()
     elif userInput == 2:
         print('Add client selected')
         addClientMenu()

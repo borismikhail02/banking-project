@@ -18,5 +18,6 @@ def checkFile():
     return True
 
 def saveFile(accounts):
-    with open(filePath, 'rb') as f:
-        accounts = pickle.load(f)
+    with open(filePath, 'wb') as f: 
+        pickle.dump(accounts, f, pickle.HIGHEST_PROTOCOL)
+    print("File successfully saved")

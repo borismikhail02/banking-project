@@ -1,8 +1,8 @@
+from fileHandling import saveFile
 import classes as c
-from fileHandling import createFile, saveFile
 from datetime import date
 import re
-
+from decimal import Decimal
         
 # Declaration of main application menu
 def mainMenu(accounts):
@@ -33,6 +33,23 @@ def mainMenu(accounts):
         searchDate = ("{0}-{1}-{2}").format(splitData[0],splitData[1],splitData[2])
         return(searchDate)
 
+    def decimalValidityCheck(amount):
+            print(Decimal(amount))
+            try:
+                if Decimal(amount) != 0:
+                    print('decimal != 0')
+                    splitDecimal = str(amount).split('.')
+                    print(splitDecimal, len(splitDecimal))
+                    if len(splitDecimal) > 1:
+                        print(len(splitDecimal[1]))
+                        if not len(splitDecimal[1]) > 2:
+                            return True
+                        else:
+                            print('Incorrect amount entry, please specify up to a max of 2 decimal places')
+                    else:
+                        return True
+            except:
+                return False
             
 
     # Declarations of submenus within main menu
@@ -68,7 +85,7 @@ def mainMenu(accounts):
             return mainMenu(accounts)
         
 
-    def addClientMenu():
+    def addClientMenu(editAccount=False):
         # Selection menu for prefered title
         def titleMenu():
             titles = ['Mr','Mrs','Miss','Ms','Dr','Other']
@@ -78,7 +95,8 @@ def mainMenu(accounts):
             3 - Miss
             4 - Ms
             5 - Dr
-            6 - Other\n''')
+            6 - Other
+            ''')
             # Loops an error until a valid input within range is given
             while not intValidityCheck(userInput, (1,6)):
                 input('Input was not valid, please press enter to try again')
@@ -159,6 +177,9 @@ def mainMenu(accounts):
         print('You selected an overdraft amount of:', overdraft)
         inputManager(overdraft, 'pass', 'overdraft')
 
+        if editAccount:
+            return details
+
         print(details)
         accounts.addClient(details)
 
@@ -186,60 +207,141 @@ def mainMenu(accounts):
                 input('Input was not valid, please press enter to try again')
                 return selectClientMenu()
             results = accounts.clientSearch('dob', dateValidityCheck(search))
-        print('results:', results)
+        elif userInput == '3':
+            print("You have selected: Search for negative balances")
+            results = accounts.clientSearch('negBal', search=None)
+
+        selectResultsMenu(results)
 
         mainMenu(accounts)
+
+    def selectResultsMenu(results):
+        if len(results) == 0:
+            print('No results found')
+            return selectClientMenu()
+        elif len(results) == 1:
+            clientMenu(results[0])
+        else:
+            print('There are more than one account matching your search criteria, please select one:')
+            for i in range(len(results)):
+                results[i].displaySummary(i+1)
+            userInput = input("Please type the number of the correct account\n")
+            while not intValidityCheck(userInput, (1, len(results))):
+                input('Input was not valid, please press enter to try again')
+                return selectResultsMenu(results)
+            clientMenu(results[int(userInput)-1])
+
+            
+
+    def deleteClientMenu(clientAccount):
+        userInput = input("Are you sure you want to delete this client account? (y/n)")
+        # Validation checks for the user input
+        print(userInput == 'n')
+        while userInput != 'y' and userInput != 'n' and userInput != 'Y' and userInput != 'N':
+            input('Input was not valid, please press enter to try again')
+            return deleteClientMenu(clientAccount)
+        if userInput == 'y' or userInput == 'Y':
+            print('Deleting client')
+            accounts.deleteClient(clientAccount)
+        elif userInput == 'n' or userInput == 'N':
+            print('Returning to main menu')
+        mainMenu(accounts)
+
+    def editClient(clientAccount):
+        details = addClientMenu(editAccount=True)
+        accounts.replaceClient(clientAccount, details)
+        print("Account details replaced")
+        input("Press enter to return to main menu")
+        mainMenu(accounts)
+
+    def editBalanceMenu(clientAccount):
+        userInput = input('''Would you like to deposit money or withdraw:
+        1 - Deposit
+        2 - Widthdraw
+        ''')
+        # Loops an error until a valid input within range is given
+        print(intValidityCheck(userInput, (1,2)))
+        while not intValidityCheck(userInput, (1,2)):
+            input('Input was not valid, please press enter to try again')
+            return editBalanceMenu(clientAccount)
+        if userInput == '1':
+            amount = input("How much would you like to deposit?\n£")
+        elif userInput == '2':
+            amount = input("How much would you like to widthraw?\n£")
+        # Loops an error until a valid (max 2 decimal input is given)
+        while not decimalValidityCheck(amount):
+            input('Input was not valid, please press enter to try again')
+            return editBalanceMenu(clientAccount)
+        if userInput == '2':
+            amount = 0 - Decimal(amount)
+        clientAccount.editBalance(amount)
+
+
+    def clientMenu(clientAccount):
+        display = ("{0} {1}'s account selected").format(clientAccount.getFirstName(), clientAccount.getLastName())
+        print(display)
+        userInput = input('''
+        1 - Show account details
+        2 - Edit account details
+        3 - Deposit/Withdraw
+        4 - Delete account
+        5 - Back to main menu
+        ''')
+
+        # Loops an error until a valid input within range is given
+        while not intValidityCheck(userInput, (1,5)):
+            input('Input was not valid, please press enter to try again')
+            return clientMenu(clientAccount)
+        if userInput == '1':
+            clientAccount.displayFull()
+            input("Press enter to return to client menu")
+            clientMenu(clientAccount)
+        elif userInput == '2':
+            editClient(clientAccount)
+        elif userInput == '3':
+            editBalanceMenu(clientAccount)
+        elif userInput == '4':
+            deleteClientMenu(clientAccount)
+        elif userInput == '5':
+            return mainMenu(accounts)
 
     # Beginning of main menu
     print('''
         - - - - - - - - - -
            Bank Project
         - - - - - - - - - -''')
-    print('''
+    userInput = input('''
     1 - List clients
     2 - Add client
     3 - Select client
-        - Show
-        - Edit
+        - Show details
+        - Edit details
+        - Depsit/Withdraw
         - Delete
     4 - Clear all clients
-    5 - Save and Exit''')
+    5 - Save and Exit
+    ''')
 
-    # Validation checks for the user input
-    try:
-        # Raises ValueError if input type is not int
-        userInput = int(input('Select a menu item by typing its number: '))
-        # Raises custom ValueRangeError if input out of desired range
-        if userInput > 5 or userInput <= 0:
-            raise c.ValueRangeError
-    # Handling differnet error types
-    except ValueError:
-        print('User input is not a recognisable value for this input')
-        input('Please press enter to try again')
+    # Loops an error until a valid input within range is given
+    while not intValidityCheck(userInput, (1,5)):
+        input('Input was not valid, please press enter to try again')
         return mainMenu(accounts)
-    except c.ValueRangeError:
-        print("Value inputed is out of range")
-        input('Please press enter to try again')
-        return mainMenu(accounts)
-    except:
-        print('Unknown error')
-        input('Please press enter to try again')
-        return mainMenu()
+
     
     # Once input has passed all validation it triggers next function(s)
-    if userInput == 5:
+    if userInput == '5':
         saveFile(accounts)
         exit()
-    elif userInput == 4:
+    elif userInput == '4':
         print('Clearing all clients selected')
         clearClientsMenu()
-    elif userInput == 3:
+    elif userInput == '3':
         print('Selecting client selected')
         selectClientMenu()
-    elif userInput == 2:
+    elif userInput == '2':
         print('Add client selected')
         addClientMenu()
-    elif userInput == 1:
+    elif userInput == '1':
         print('List all clients selected')
         listClients(accounts)
 

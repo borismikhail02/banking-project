@@ -3,13 +3,13 @@ import pickle
 
 filePath = "banking-project/accountsFile.txt"
 
+# Creates new file if one doesnt exist already
 def createFile():
-    # Creates new file if one doesnt exist already
     with open(filePath, "w") as f:
         f.write('')
 
+# Returns booleon value whether file exists
 def checkFile():
-    # Booleon return value for if file exists
     fileCheck = os.path.isfile(filePath)
     if not fileCheck:
         print("File does not exist")
@@ -17,6 +17,7 @@ def checkFile():
     print("File is already created")
     return True
 
+# Saves account object in the file
 def saveFile(accounts):
     with open(filePath, 'wb') as f: 
         pickle.dump(accounts, f, pickle.HIGHEST_PROTOCOL)

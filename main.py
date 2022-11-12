@@ -1,24 +1,24 @@
 import classes as c
-import pickle
 import menus as m
 from fileHandling import *
+import pickle
 
 def main():
     # Checking if file exists, creating one if not
     if not checkFile():
         print('No file, creating file')
         createFile()
-
     accounts = loadAccounts()
     m.mainMenu(accounts)
 
+# Returns the accounts object after loading it from file
 def loadAccounts():
     def checkForAccount(file):
         # If pickle.load returns an error runs the except condition, otherwise returns account object
         try:
-            accountObj = pickle.load(file)
+            accountObject = pickle.load(file)
             print("Account object found")
-            return accountObj
+            return accountObject
         except:
             print('No object loaded on that file')
             return False
@@ -37,7 +37,6 @@ def loadAccounts():
             createFileObject()
             accountObject = checkForAccount(f)
 
-    print('Accounts loaded:', accountObject)
     return accountObject
 
 main()

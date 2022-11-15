@@ -12,7 +12,7 @@ def main():
     m.mainMenu(accounts)
 
 # Returns the accounts object after loading it from file
-def loadAccounts():
+def loadAccounts(): 
     def checkForAccount(file):
         # If pickle.load returns an error runs the except condition, otherwise returns account object
         try:

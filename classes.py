@@ -1,4 +1,3 @@
-from datetime import date
 from decimal import Decimal
 
 class Accounts():
@@ -57,6 +56,10 @@ class Accounts():
                 outputList.append(client)
         return outputList
 
+
+    # def getClientDetails(clients):
+    #     for client in clients:
+    #         print('Name:', client.getFullName())
     
 
 class ClientAccount():

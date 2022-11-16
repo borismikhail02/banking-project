@@ -37,7 +37,6 @@ def mainMenu(accounts):
             print(Decimal(amount))
             try:
                 if Decimal(amount) != 0:
-                    print('decimal != 0')
                     splitDecimal = str(amount).split('.')
                     print(splitDecimal, len(splitDecimal))
                     if len(splitDecimal) > 1:

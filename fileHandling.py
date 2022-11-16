@@ -1,7 +1,7 @@
 import os
 import pickle
 
-filePath = "banking-project/accountsFile.txt"
+filePath = "accountsFile.txt"
 
 # Creates new file if one doesnt exist already
 def createFile():

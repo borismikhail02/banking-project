@@ -16,7 +16,7 @@ def checkFile():
         return False
     print("File is already created")
     return True
-
+    
 # Saves account object in the file
 def saveFile(accounts):
     with open(filePath, 'wb') as f: 

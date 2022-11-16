@@ -8,6 +8,9 @@ Once the accounts object is loaded from 'accountsList.txt' or a new one is creat
 
 No changes made in the runtime of the application will be saved unless the "Save and Exit" option is seletected from the main menu, which will save the edided accounts object to the file and close the program.
 
+Notes:
+- Data validation is all done within the user interface, and only valid data is sent to class methods. This is to avoid unnexpected errors within the classes and possible data corruption.
+
 
 Assumptions made in building:
 -----------------------------

@@ -22,6 +22,8 @@ class Accounts():
 
     # Display methods
     def listAccounts(self):
+        if len(self.accountsList) == 0:
+            print('No accounts found')
         for i in range(len(self.accountsList)):
             print('Account number:', i+1)
             self.accountsList[i].displayFull()

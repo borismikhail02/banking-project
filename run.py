@@ -3,8 +3,8 @@ import main as m
 from fileHandling import *
 import pickle
 
-def main():
-    # Checking if file exists, creating one if not
+# Checking if file exists, creating one if not. Then loading accounts object from file and running main menu
+def run():
     if not checkFile():
         print('No file, creating file')
         createFile()
@@ -13,8 +13,8 @@ def main():
 
 # Returns the accounts object after loading it from file
 def loadAccounts(): 
+    # Extra validation to avoid possible data problems, if pickle.load returns an error runs the except condition, otherwise returns account object
     def checkForAccount(file):
-        # If pickle.load returns an error runs the except condition, otherwise returns account object
         try:
             accountObject = pickle.load(file)
             print("Account object found")
@@ -36,7 +36,7 @@ def loadAccounts():
         if not accountObject:
             createFileObject()
             accountObject = checkForAccount(f)
-
+            
     return accountObject
 
-main()
+run()

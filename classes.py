@@ -59,11 +59,6 @@ class Accounts():
         return outputList
 
 
-    # def getClientDetails(clients):
-    #     for client in clients:
-    #         print('Name:', client.getFullName())
-    
-
 class ClientAccount():
     # Class constructor
     def __init__(self, clientDetails):
